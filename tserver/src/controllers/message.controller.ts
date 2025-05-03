@@ -77,6 +77,8 @@ const sentMessage = asyncHandler(async(req:AuthenticatedRequest, res:Response) =
         attachMents: attachement.length>0 ? attachement : undefined
     })
 
+    chatExists.lastMessage = message._id as Types.ObjectId;
+    await chatExists.save();
     const populateMessage = await Message.findById(message._id)
             .populate("sender", "fullName profile email")
             .lean();
