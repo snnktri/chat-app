@@ -4,6 +4,14 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Request, Response, NextFunction } from "express";
+import { CookieOptions } from "express";
+
+interface AuthenticatedRequest extends Request {
+    user?: {
+        _id: string;
+        refreshToken?: string;
+    }
+}
 
 const generateAccessRefreshToken = async(userId:string):Promise<{
     accessToken:string;
@@ -94,7 +102,7 @@ const loginUser = asyncHandler(async(req: Request, res: Response) => {
         throw new ApiError(500, "User is not logged due to internal error.");
     }
 
-    const options = {
+    const options: CookieOptions = {
         // httpOnly: true,
         secure: true
     }
@@ -106,4 +114,36 @@ const loginUser = asyncHandler(async(req: Request, res: Response) => {
             new ApiResponse(200, loggedUser, "user loggin successfully")
         );
 });
-export { registerUser, loginUser };
+
+const logoutUser = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+    if(!user || !user._id) {
+        throw new ApiError(401, "Unauthorized access.");
+    }
+
+   await User.findByIdAndUpdate(user._id,
+    {
+        $unset: {
+            refreshToken: undefined,
+        },
+             
+    },
+    {
+        new: true,
+    });
+   
+    const options: CookieOptions = {
+        // httpOnly: true,
+        secure: true
+    }
+
+    res.status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(
+            new ApiResponse(200,{}, "Logout user successfully.")
+        );
+
+
+});
+export { registerUser, loginUser, logoutUser };

@@ -1,16 +1,16 @@
 import { User } from "../models/user.model.js";
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { asyncHandler  } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.ts";
 import { NestedPaths } from "mongoose";
 
 
 interface AuthenticatedRequest extends Request {
-    user?:typeof User.prototype;
+    user?: InstanceType<typeof User>;
 }
 
-interface JetPayload {
+interface JwtPayload {
     _id: string;
     iat?:number;
     exp?:number;
