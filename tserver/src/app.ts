@@ -20,7 +20,13 @@ app.use(cookieParser());
 
 //routes goes here
 
-import userRoute from "./routes/user.route.js";
-app.use("/api/v1/user", userRoute);
+import userRouter from "./routes/user.route.js";
+import messageRouter from "./routes/message.route.ts";
+import chatRouteer from "./routes/chat.route.ts";
+
+
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/message", messageRouter);
+app.use("api/v1/chat", chatRouteer);
 
 export { app };

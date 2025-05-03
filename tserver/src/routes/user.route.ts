@@ -1,6 +1,6 @@
 //import { app } from "../app.js";
 import { Router } from "express";
-import { registerUser, loginUser, logoutUser } from "../controllers/user.controllers.js";
+import { registerUser, loginUser, logoutUser } from "../controllers/user.controllers.ts";
 import { upload } from "../middelwares/multer.middelware.js";
 import { verifyJWT } from "../middelwares/auth.middelware.js";
 
