@@ -13,6 +13,12 @@ export interface IUser extends Document {
     generateRefreshToken():string;
 }
 
+// interface UserModel extends Model<IUser>{
+//     isPasswordCorrect(enterPassword: string): Promise<boolean>;
+//     generateAccessToken():string;
+//     generateRefreshToken():string;
+// }
+
 const userSchema: Schema<IUser> = new mongoose.Schema(
     {
         fullName: {
@@ -60,6 +66,7 @@ userSchema.pre('save', async function(next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (
+    this: IUser,
     enterPassword: string
     ):Promise<boolean> {
         try {
