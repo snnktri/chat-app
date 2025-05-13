@@ -24,8 +24,8 @@ const messageSchema: Schema<IMessage> = new Schema({
         trim: true,
     },
     chat: {
-        tyep: Schema.Types.ObjectId,
-        reg: "Chat",
+        type: Schema.Types.ObjectId,
+        ref: "Chat",
         required: true
     },
     readBy: [

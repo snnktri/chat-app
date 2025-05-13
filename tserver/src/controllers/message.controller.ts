@@ -7,6 +7,7 @@ import { Types } from 'mongoose';
 import { ApiError } from "../utils/ApiError.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
 import { uploadOnCloudinary } from "../utils/cloudinary.ts";
+import { getIO } from '../socket.ts';
 
 interface AuthenticatedRequest extends Request {
     user?:{
@@ -84,6 +85,10 @@ const sentMessage = asyncHandler(async(req:AuthenticatedRequest, res:Response) =
             .lean();
 
 
+    const io = getIO();
+
+    io.to(chatId).emit('receive_message', populateMessage);
+
     res.status(200)
     .json(
         new ApiResponse(200, populateMessage, "Message sent Successfully.")
@@ -110,7 +115,7 @@ const getMessage = asyncHandler(async(req:AuthenticatedRequest, res:Response) =>
         throw new ApiError(403, "Authorizaion required for chat.");
     }
 
-    const message = await Message.find({chat:chatId}).sort({createAt: -1})
+    const message = await Message.find({chat:chatId}).sort({createdAt: -1})
         .populate("sender", "fullName profile email").lean();
 
     res.status(200)
@@ -119,5 +124,43 @@ const getMessage = asyncHandler(async(req:AuthenticatedRequest, res:Response) =>
         );
 });
 
-export { sentMessage, getMessage };
+const markAsRead = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?._id;
+
+    const { chatId } = req.params;
+
+    if(!userId || !chatId) {
+        throw new ApiError(400, "User Id and chat Id are required.");
+    }
+
+    const chat = await Chat.findById(chatId);
+
+    if(!chat) {
+        throw new ApiError(404, "Chat not found.");
+    }
+
+    const isParticipant = chat.participants.includes(new Types.ObjectId(userId));
+
+    if(!isParticipant) {
+        throw new ApiError(403, "You are not authorized to read this chat");
+    }
+
+    const result = await Message.updateMany(
+        {
+            chat: chatId,
+            readBy: { $ne: userId},
+        },
+        {
+            $addToSet: {
+                readBy: userId
+            }
+        }
+    );
+
+    res.status(200).json(
+        new ApiResponse(200, {modifiedCount: result.upsertedCount}, "messages marked as read")
+    )
+});
+
+export { sentMessage, getMessage, markAsRead };
 

@@ -27,6 +27,6 @@ import chatRouteer from "./routes/chat.route.ts";
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/message", messageRouter);
-app.use("api/v1/chat", chatRouteer);
+app.use("/api/v1/chat", chatRouteer);
 
 export { app };

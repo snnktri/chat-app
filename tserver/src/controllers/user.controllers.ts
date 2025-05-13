@@ -72,9 +72,14 @@ const registerUser = asyncHandler(async(req: Request, res: Response) => {
         throw new ApiError(401, "user not created.");
     }
 
+    const createdUser = await User.findById(createUser._id).select("-password -refreshToken");
+
+    if(!createdUser) {
+        throw new ApiError(500, "usrr not regiseter.");
+    }
     res.status(201)
     .json(
-        new ApiResponse(200, createUser, "User created sussessfully.")
+        new ApiResponse(200, createdUser, "User created sussessfully.")
     );
 });
  
@@ -111,7 +116,7 @@ const loginUser = asyncHandler(async(req: Request, res: Response) => {
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            new ApiResponse(200, loggedUser, "user loggin successfully")
+            new ApiResponse(200, {loggedUser, accessToken, refreshToken}, "user loggin successfully")
         );
 });
 
@@ -146,4 +151,22 @@ const logoutUser = asyncHandler(async(req: AuthenticatedRequest, res: Response) 
 
 
 });
-export { registerUser, loginUser, logoutUser };
+
+const protectedUser = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?._id;
+
+    if(!userId) {
+        throw new ApiError(401, "User should be logged in.");
+    } 
+
+    const loggedUser = await User.findById(userId).select("-password, -refreshToken");
+
+    if(!loggedUser) {
+        throw new ApiError(404, "User not found");
+    }
+
+    res.status(200).json(
+        new ApiResponse(200, loggedUser, "User is logged in.")
+    );
+})
+export { registerUser, loginUser, logoutUser, protectedUser };

@@ -1,4 +1,4 @@
-import { getMessage, sentMessage } from "../controllers/message.controller.ts";
+import { getMessage, markAsRead, sentMessage } from "../controllers/message.controller.ts";
 import { upload } from "../middelwares/multer.middelware.ts";
 import { verifyJWT } from "../middelwares/auth.middelware.ts";
 import { Router } from "express";
@@ -11,10 +11,14 @@ router.route("/sentMessage").post(
     sentMessage
 )
 
-router.route("/getMessage").post(
+router.route("/getMessage/:chatId").get(
     verifyJWT,
     getMessage
-)
+);
+
+router.route("/markAsRead/:chatId").put(
+    verifyJWT,
+    markAsRead);
 
 
 export default router;
