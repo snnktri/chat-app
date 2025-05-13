@@ -3,7 +3,7 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 const Layout = () => {
   return (
-    <div>
+    <div className="min-h-screen">
       <NavBar />
       <Outlet />
       <Footer />
