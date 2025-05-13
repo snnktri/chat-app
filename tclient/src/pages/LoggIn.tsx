@@ -3,7 +3,8 @@ import { AppDispatch } from "../app/store";
 import { useDispatch } from "react-redux";
 import { setProfile, setUser, setUserId } from "../features/auth";
 import { api } from "../utils/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+
 
 
 interface User {
@@ -75,16 +76,40 @@ const LoggIn:React.FC = () => {
       }
     }
   return (
-    <div>
-      <div>
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <input type="email" value={userData.email} name="email" onChange={hanldeChange}/>
-        <input type="password" name="password" value={userData.password} onChange={hanldeChange}/>
-        <button type="submit">{
+    <div className="w-full min-h-screen bg-gray-300 p-4 flex justify-center items-center">
+      <div className="w-[80%] p-4 md:w-[60%]">
+        <h2 className="text-center uppercase font-bold p-4">Login</h2>
+        <form onSubmit={handleSubmit} encType="multipart/form-data"
+        className="space-y-4 flex flex-col p-6 bg-white w-[100%] rounded-xl shadow-xl">
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="Email" className="whitespace-nowrap">Email:</label>
+          <input
+          className="block w-[100%] p-2 rounded-xl border-1 outline-none focus:outline-none"
+           type="email"
+           value={userData.email}
+           placeholder="snk@gmail.com" 
+           name="email" 
+           onChange={hanldeChange}
+        />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="password" className="whitespace-nowrap">Password:</label>
+          <input 
+          className="block w-[100%] p-2 rounded-xl border-1 outline-none focus:outline-none"
+        type="password" 
+        name="password" 
+        value={userData.password} 
+        onChange={hanldeChange}
+        />
+        </div>
+        <button type="submit"
+        disabled={loading}
+        className="bg-blue-500 rounded-xl p-3 text-white hover:bg-blue-600 hover:scale-105 transform ease-in duration-75 delay-75 cursor-pointer">{
           loading ? "Loaidng...." : "login"}
         </button>
+        <p className="text-center">Don't have any account? <NavLink to="/register" className="text-blue-700">Sign Up</NavLink></p>
         </form>
-        {message && <p>{message}</p>}
+        {message && <p className="text-center text-red-500">{message}</p>}
       </div>
     </div>
   )
